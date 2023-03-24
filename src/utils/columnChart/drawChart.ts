@@ -40,8 +40,12 @@ class DrawChart {
     this.context = this.canvas?.getContext('2d')
     this.options = options
     this.setToolTipData = setToolTipData
-    this.context?.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    if (this.context) {
+    this.init()
+  }
+  init() {
+    if (this.context && this.canvas) {
+      this.context.beginPath()
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
       this.context.fillStyle = '#fff'
       this.context?.fillRect(0, 0, this.canvas.width, this.canvas.height)
       this.context.strokeStyle = '#666'
@@ -55,6 +59,7 @@ class DrawChart {
       this.initEvent()
     }
   }
+
   renderdata() {
     const { data } = this.options
     const dataMap = new Map()
@@ -111,7 +116,7 @@ class DrawChart {
       this.context.stroke()
       const { maxValue } = this.data
       this.context.textAlign = 'right'
-      this.context.lineWidth = 0.5
+
       const width = (this.canvas?.width ?? 300) - this.leftPadding * 2
       const chartHeight = bottomY - this.topPadding
       for (let i = 0; i < 5; i++) {
@@ -121,7 +126,7 @@ class DrawChart {
           this.leftPadding - 10,
           y,
         )
-        this.context?.fillRect(this.leftPadding, y, width, 1)
+        this.context?.fillRect(this.leftPadding, y, width, 0.5)
       }
     }
   }
@@ -234,7 +239,6 @@ class DrawChart {
   }
 
   renderTipMask(x?: number) {
-    return
     if (this.canvas && this.context) {
       const width = this.columnWidth + this.span
       const height = this.canvas?.height - 2 * this.topPadding
@@ -245,7 +249,7 @@ class DrawChart {
           this.maskX = x
         }
       } else if (this.maskX) {
-        // this.context.clearRect(this.maskX, this.topPadding, width, height)
+        this.init()
         this.maskX = undefined
       }
     }
