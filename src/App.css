@@ -14,12 +14,21 @@
 }
 .toolTip{
   position: absolute;
-  padding: 10px;
   display: none;
-  max-width: 300px;
-  color: #000;
-  border: 1px solid #666;
-  background-color: #fff;
+  z-index: 8;
+  transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s, top 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s;
+  background-color: rgb(255, 255, 255);
+  box-shadow: rgb(174 174 174) 0px 0px 10px;
+  border-radius: 3px;
+  color: rgb(89, 89, 89);
+  font-size: 12px;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 20px;
+  padding:12px;
+  opacity: 0.95;
+  pointer-events: none;
+  text-align: left;
+  transform: translateY(-100%);
 }
 .App-header {
   background-color: #282c34;

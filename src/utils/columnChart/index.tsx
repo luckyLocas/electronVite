@@ -12,7 +12,7 @@ interface IProps {
  */
 const ColumnChart: React.FC<IProps> = (props) => {
   const { height = 300 } = props
-  const [toolTipData, setToolTipData] = useState()
+  const [toolTipData, setToolTipData] = useState<any>()
   const id = useMemo(() => {
     return String(Math.ceil(+new Date() + Math.random() * 100))
   }, [])
@@ -51,6 +51,7 @@ const ColumnChart: React.FC<IProps> = (props) => {
     <div style={{ position: 'relative' }}>
       <canvas id={id} height={height} width={1000} />
       <div className="toolTip" id={`${id}_toolTip`}>
+        <div>{toolTipData?.data[0]?.type}</div>
         {toolTipData?.data?.map((item: any) => {
           return (
             <div>

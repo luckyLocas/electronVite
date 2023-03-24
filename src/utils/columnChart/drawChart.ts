@@ -32,6 +32,7 @@ class DrawChart {
     '#FF99C3',
   ]
   setToolTipData: ((data?: any) => void) | undefined
+  maskX: number | undefined
 
   constructor(props: IProps) {
     const { id, options, setToolTipData } = props
@@ -49,7 +50,7 @@ class DrawChart {
       this.renderdata()
       this.drawXAxis()
       this.drawYAxis()
-      this.drawData()
+      this.drawRectChart()
       this.drawValueText()
       this.initEvent()
     }
@@ -66,10 +67,12 @@ class DrawChart {
       if (value > maxValue) maxValue = value
     })
     if (dataMap.size) {
-      this.columnWidth =
-        Math.floor((this.canvas?.width ?? 300) / dataMap.size) < 60
-          ? 60
-          : Math.floor((this.canvas?.width ?? 300) / dataMap.size)
+      const width =
+        (this.canvas?.width ?? 300) -
+        2 * this.leftPadding -
+        (dataMap.size + 1) * this.span
+      const groupWidth = Math.ceil(width / dataMap.size)
+      this.columnWidth = groupWidth < 60 ? 60 : groupWidth
     }
     this.data = {
       dataMap,
@@ -122,7 +125,7 @@ class DrawChart {
       }
     }
   }
-  drawData() {
+  drawRectChart() {
     if (this.context) {
       const height = this.canvas?.height ?? 300
       const chartHeight = height - this.topPadding * 2
@@ -194,34 +197,63 @@ class DrawChart {
     }
   }
 
-  getFormatData(e: MouseEvent) {
-    if (!this.setToolTipData) return
+  getToolTipData(e: MouseEvent) {
+    if (!this.setToolTipData || !this.canvas) return
     const { offsetX, offsetY } = e
     const curX = offsetX - this.leftPadding
     const curY = offsetY - this.topPadding
+    const maxX = this.canvas.width - 2 * this.leftPadding
+    const maxY = this.canvas.height - 2 * this.topPadding
 
-    if (curX > 0 && curY > 0 && this.data.dataMap.size) {
+    if (curX > 0 && curX < maxX && curY > 0 && curY < maxY) {
       const index = Math.floor(curX / (this.columnWidth + this.span))
       const { data } = this.options
       const size = data.length / this.data.dataMap.size
       const curData = data.slice(index * size, index * size + size)
-      this.setToolTipData({
-        data: curData,
-        offsetX: offsetX,
-        offsetY: offsetY + 30,
-      })
-      console.log('curData', size, curData)
+      if (curData.length) {
+        this.setToolTipData({
+          data: curData,
+          offsetX: offsetX + 20,
+          offsetY: offsetY - 20,
+        })
+        const maskX =
+          this.leftPadding +
+          this.span / 2 +
+          index * (this.columnWidth + this.span)
+        if (maskX !== this.maskX) {
+          if (this.maskX) this.renderTipMask()
+          this.renderTipMask(maskX)
+        }
+      }
     } else {
       this.setToolTipData()
+      if (this.maskX) {
+        this.renderTipMask()
+      }
+    }
+  }
+
+  renderTipMask(x?: number) {
+    return
+    if (this.canvas && this.context) {
+      const width = this.columnWidth + this.span
+      const height = this.canvas?.height - 2 * this.topPadding
+      if (x) {
+        if (x !== this.maskX) {
+          this.context.fillStyle = 'rgba(28,169,230,.2)'
+          this.context.fillRect(x, this.topPadding, width, height)
+          this.maskX = x
+        }
+      } else if (this.maskX) {
+        // this.context.clearRect(this.maskX, this.topPadding, width, height)
+        this.maskX = undefined
+      }
     }
   }
 
   initEvent() {
-    let timer: string | number | NodeJS.Timeout | undefined
     this.canvas?.addEventListener('mousemove', (e) => {
-      console.log('e', e)
-      // if (timer) clearTimeout(timer)
-      this.getFormatData(e)
+      this.getToolTipData(e)
     })
   }
 }
