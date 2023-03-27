@@ -40,6 +40,7 @@ class DrawChart {
     this.context = this.canvas?.getContext('2d')
     this.options = options
     this.setToolTipData = setToolTipData
+    this.formatData()
     this.init()
   }
   init() {
@@ -51,7 +52,6 @@ class DrawChart {
       this.context.strokeStyle = '#666'
       this.context.fillStyle = '#666'
       this.context.lineWidth = 0.5
-      this.renderdata()
       this.drawXAxis()
       this.drawYAxis()
       this.drawRectChart()
@@ -60,7 +60,7 @@ class DrawChart {
     }
   }
 
-  renderdata() {
+  formatData() {
     const { data } = this.options
     const dataMap = new Map()
     let maxValue = 1
@@ -78,6 +78,10 @@ class DrawChart {
         (dataMap.size + 1) * this.span
       const groupWidth = Math.ceil(width / dataMap.size)
       this.columnWidth = groupWidth < 60 ? 60 : groupWidth
+    }
+    if (this.canvas) {
+      this.canvas.width =
+        dataMap.size * (this.columnWidth + this.span) + 2 * this.leftPadding
     }
     this.data = {
       dataMap,
@@ -209,7 +213,6 @@ class DrawChart {
     const curY = offsetY - this.topPadding
     const maxX = this.canvas.width - 2 * this.leftPadding
     const maxY = this.canvas.height - 2 * this.topPadding
-
     if (curX > 0 && curX < maxX && curY > 0 && curY < maxY) {
       const index = Math.floor(curX / (this.columnWidth + this.span))
       const { data } = this.options

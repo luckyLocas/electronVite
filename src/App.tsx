@@ -38,7 +38,9 @@ function App() {
         >
           获取打印机列表
         </button>
-        <div>
+        <div
+          style={{ width: '1000px', marginBottom: '20px', overflow: 'auto' }}
+        >
           <ColumnChart
             data={[
               {
